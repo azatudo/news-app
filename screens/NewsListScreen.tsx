@@ -64,14 +64,18 @@ export default function NewsListScreen() {
   };
 
   const sendTestNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'New article available',
-        body: 'Check the latest news',
-      },
-      trigger: null,
-    });
-  };
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'Test notification',
+      body: 'Push works',
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 2,
+      repeats: false,
+    },
+  });
+};
 
   if (loading) {
     return <ActivityIndicator style={{ marginTop: 40 }} />;
