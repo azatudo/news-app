@@ -4,11 +4,9 @@ import { useState } from 'react';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ARTICLE_URL = 'https://example.com';
-
 export default function ArticleScreen() {
   const route = useRoute<any>();
-  const { id, title, description, date } = route.params || {};
+  const { id, title, description, date, url } = route.params;
   const [showWebView, setShowWebView] = useState(false);
 
   const addToFavorites = async () => {
@@ -22,9 +20,12 @@ export default function ArticleScreen() {
         return;
       }
 
-      const updated = [...favorites, { id, title, description, date }];
-      await AsyncStorage.setItem('favorites', JSON.stringify(updated));
+      const updated = [
+        ...favorites,
+        { id, title, description, date, url },
+      ];
 
+      await AsyncStorage.setItem('favorites', JSON.stringify(updated));
       Alert.alert('Added to favorites');
     } catch {
       Alert.alert('Error saving favorite');
@@ -32,7 +33,7 @@ export default function ArticleScreen() {
   };
 
   if (Platform.OS !== 'web' && showWebView) {
-    return <WebView source={{ uri: ARTICLE_URL }} startInLoadingState />;
+    return <WebView source={{ uri: url }} startInLoadingState />;
   }
 
   return (
@@ -55,7 +56,7 @@ export default function ArticleScreen() {
         title="Open full article"
         onPress={() => {
           if (Platform.OS === 'web') {
-            window.open(ARTICLE_URL, '_blank');
+            window.open(url, '_blank');
           } else {
             setShowWebView(true);
           }

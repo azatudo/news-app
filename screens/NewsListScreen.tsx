@@ -1,4 +1,12 @@
-import { View, Text, FlatList, Button, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+  Button,
+  RefreshControl,
+} from 'react-native';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { fetchNews, NewsArticle } from '../services/newsApi';
@@ -9,10 +17,10 @@ export default function NewsListScreen() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadNews = async () => {
     try {
-      setLoading(true);
       setError(false);
       const data = await fetchNews();
       setNews(data);
@@ -26,6 +34,12 @@ export default function NewsListScreen() {
   useEffect(() => {
     loadNews();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadNews();
+    setRefreshing(false);
+  };
 
   if (loading) {
     return <ActivityIndicator style={{ marginTop: 40 }} />;
@@ -43,26 +57,35 @@ export default function NewsListScreen() {
   return (
     <FlatList
       data={news}
-      keyExtractor={(item, index) => index.toString()}
+      keyExtractor={(item) => item.id}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       contentContainerStyle={{ padding: 16 }}
       renderItem={({ item }) => (
-        <View style={{ marginBottom: 16 }}>
-          <Text
-            style={{ fontSize: 16, fontWeight: '600' }}
-            onPress={() =>
-              navigation.navigate('Article', {
-                title: item.title,
-                description: item.description,
-                date: item.publishedAt,
-                url: item.url,
-              })
-            }
-          >
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('Article', {
+              id: item.id,
+              title: item.title,
+              description: item.description,
+              date: item.date,
+              url: item.url,
+            })
+          }
+          style={{
+            padding: 12,
+            marginBottom: 12,
+            backgroundColor: '#f2f2f2',
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: '600' }}>
             {item.title}
           </Text>
-
           <Text style={{ color: '#555' }}>{item.description}</Text>
-        </View>
+          <Text style={{ fontSize: 12, color: '#888' }}>{item.date}</Text>
+        </TouchableOpacity>
       )}
     />
   );

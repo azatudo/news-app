@@ -53,6 +53,7 @@ export default function FavoritesScreen() {
                 title: item.title,
                 description: item.description,
                 date: item.date,
+                url: item.url,
               })
             }
           >
