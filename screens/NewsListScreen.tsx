@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 import { fetchNews, NewsArticle } from '../services/newsApi';
 
 export default function NewsListScreen() {
@@ -31,7 +32,6 @@ export default function NewsListScreen() {
     try {
       setError(false);
       const data = await fetchNews(pageToLoad, q);
-
       setNews((prev) => (append ? [...prev, ...data] : data));
       setPage(pageToLoad);
     } catch {
@@ -63,6 +63,16 @@ export default function NewsListScreen() {
     loadNews(1, false, query);
   };
 
+  const sendTestNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'New article available',
+        body: 'Check the latest news',
+      },
+      trigger: null,
+    });
+  };
+
   if (loading) {
     return <ActivityIndicator style={{ marginTop: 40 }} />;
   }
@@ -89,8 +99,10 @@ export default function NewsListScreen() {
             borderColor: '#ccc',
             borderRadius: 8,
             padding: 8,
+            marginBottom: 8,
           }}
         />
+        <Button title="Test notification" onPress={sendTestNotification} />
       </View>
 
       <FlatList

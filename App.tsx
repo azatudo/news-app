@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 import NewsListScreen from './screens/NewsListScreen';
 import ArticleScreen from './screens/ArticleScreen';
@@ -12,6 +14,16 @@ import AuthScreen from './screens/AuthScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 function Tabs({ onLogout }: { onLogout: () => void }) {
   return (
@@ -37,6 +49,27 @@ export default function App() {
       setIsAuthenticated(value === 'true');
     };
     checkAuth();
+  }, []);
+
+  useEffect(() => {
+    const registerForPush = async () => {
+      if (!Device.isDevice) return;
+
+      const { status } = await Notifications.getPermissionsAsync();
+      let finalStatus = status;
+
+      if (status !== 'granted') {
+        const permission = await Notifications.requestPermissionsAsync();
+        finalStatus = permission.status;
+      }
+
+      if (finalStatus !== 'granted') return;
+
+      const token = await Notifications.getExpoPushTokenAsync();
+      console.log('PUSH TOKEN:', token.data);
+    };
+
+    registerForPush();
   }, []);
 
   if (isAuthenticated === null) {

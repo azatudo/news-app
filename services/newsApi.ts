@@ -7,20 +7,28 @@ export type NewsArticle = {
 };
 
 const API_KEY = process.env.EXPO_PUBLIC_NEWS_API_KEY;
-const BASE_URL = 'https://newsapi.org/v2/top-headlines';
+const PAGE_SIZE = 20;
+const BASE_URL = 'https://newsapi.org/v2';
 
 export async function fetchNews(
   page: number,
-  query = '',
-  pageSize = 20
+  query?: string
 ): Promise<NewsArticle[]> {
-  const q = query ? `&q=${encodeURIComponent(query)}` : '';
+  if (!API_KEY) {
+    throw new Error('NewsAPI key is missing');
+  }
+
+  const endpoint = query
+    ? `${BASE_URL}/everything?q=${encodeURIComponent(query)}`
+    : `${BASE_URL}/top-headlines?country=us`;
 
   const res = await fetch(
-    `${BASE_URL}?country=us&page=${page}&pageSize=${pageSize}${q}&apiKey=${API_KEY}`
+    `${endpoint}&page=${page}&pageSize=${PAGE_SIZE}&apiKey=${API_KEY}`
   );
 
   if (!res.ok) {
+    const text = await res.text();
+    console.log('NEWS API ERROR:', text);
     throw new Error('Failed to fetch news');
   }
 
