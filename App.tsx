@@ -11,6 +11,7 @@ import NewsListScreen from './screens/NewsListScreen';
 import ArticleScreen from './screens/ArticleScreen';
 import FavoritesScreen from './screens/FavoritesScreen';
 import AuthScreen from './screens/AuthScreen';
+import FileScreen from './screens/FileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -36,6 +37,11 @@ function Tabs({ onLogout }: { onLogout: () => void }) {
       <Tab.Screen name="FavoritesTab" options={{ title: 'Favorites' }}>
         {() => <FavoritesScreen onLogout={onLogout} />}
       </Tab.Screen>
+      <Tab.Screen
+        name="FilesTab"
+        component={FileScreen}
+        options={{ title: 'Files' }}
+      />
     </Tab.Navigator>
   );
 }
