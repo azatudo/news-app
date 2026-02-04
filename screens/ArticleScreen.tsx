@@ -8,7 +8,7 @@ const ARTICLE_URL = 'https://example.com';
 
 export default function ArticleScreen() {
   const route = useRoute<any>();
-  const { title, description, date } = route.params || {};
+  const { id, title, description, date } = route.params || {};
   const [showWebView, setShowWebView] = useState(false);
 
   const addToFavorites = async () => {
@@ -16,13 +16,13 @@ export default function ArticleScreen() {
       const stored = await AsyncStorage.getItem('favorites');
       const favorites = stored ? JSON.parse(stored) : [];
 
-      const exists = favorites.some((item: any) => item.title === title);
+      const exists = favorites.some((item: any) => item.id === id);
       if (exists) {
         Alert.alert('Already in favorites');
         return;
       }
 
-      const updated = [...favorites, { title, description, date }];
+      const updated = [...favorites, { id, title, description, date }];
       await AsyncStorage.setItem('favorites', JSON.stringify(updated));
 
       Alert.alert('Added to favorites');
@@ -41,9 +41,7 @@ export default function ArticleScreen() {
         {title}
       </Text>
 
-      <Text style={{ marginBottom: 8 }}>
-        {description}
-      </Text>
+      <Text style={{ marginBottom: 8 }}>{description}</Text>
 
       <Text style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>
         {date}

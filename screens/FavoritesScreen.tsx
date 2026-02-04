@@ -1,18 +1,19 @@
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FavoritesScreen() {
   const [favorites, setFavorites] = useState<any[]>([]);
+  const navigation = useNavigation<any>();
 
   const loadFavorites = async () => {
     const stored = await AsyncStorage.getItem('favorites');
     setFavorites(stored ? JSON.parse(stored) : []);
   };
 
-  const removeFavorite = async (title: string) => {
-    const updated = favorites.filter((item) => item.title !== title);
+  const removeFavorite = async (id: string) => {
+    const updated = favorites.filter((item) => item.id !== id);
     setFavorites(updated);
     await AsyncStorage.setItem('favorites', JSON.stringify(updated));
   };
@@ -34,7 +35,7 @@ export default function FavoritesScreen() {
   return (
     <FlatList
       data={favorites}
-      keyExtractor={(_, index) => index.toString()}
+      keyExtractor={(item) => item.id}
       contentContainerStyle={{ padding: 16 }}
       renderItem={({ item }) => (
         <View
@@ -45,14 +46,25 @@ export default function FavoritesScreen() {
             borderRadius: 8,
           }}
         >
-          <Text style={{ fontWeight: '600' }}>{item.title}</Text>
-          <Text>{item.description}</Text>
-          <Text style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>
-            {item.date}
-          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Article', {
+                id: item.id,
+                title: item.title,
+                description: item.description,
+                date: item.date,
+              })
+            }
+          >
+            <Text style={{ fontWeight: '600' }}>{item.title}</Text>
+            <Text>{item.description}</Text>
+            <Text style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>
+              {item.date}
+            </Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => removeFavorite(item.title)}
+            onPress={() => removeFavorite(item.id)}
             style={{
               backgroundColor: '#e74c3c',
               paddingVertical: 8,

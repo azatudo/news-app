@@ -42,6 +42,7 @@ export default function NewsListScreen() {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('Article', {
+                id: item.id,
                 title: item.title,
                 description: item.description,
                 date: item.date,
@@ -57,14 +58,8 @@ export default function NewsListScreen() {
             <Text style={{ fontSize: 16, fontWeight: '600' }}>
               {item.title}
             </Text>
-
-            <Text style={{ marginTop: 4, color: '#555' }}>
-              {item.description}
-            </Text>
-
-            <Text style={{ marginTop: 6, fontSize: 12, color: '#888' }}>
-              {item.date}
-            </Text>
+            <Text>{item.description}</Text>
+            <Text style={{ fontSize: 12, color: '#888' }}>{item.date}</Text>
           </TouchableOpacity>
         )}
       />
