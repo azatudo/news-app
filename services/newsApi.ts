@@ -11,10 +11,13 @@ const BASE_URL = 'https://newsapi.org/v2/top-headlines';
 
 export async function fetchNews(
   page: number,
+  query = '',
   pageSize = 20
 ): Promise<NewsArticle[]> {
+  const q = query ? `&q=${encodeURIComponent(query)}` : '';
+
   const res = await fetch(
-    `${BASE_URL}?country=us&page=${page}&pageSize=${pageSize}&apiKey=${API_KEY}`
+    `${BASE_URL}?country=us&page=${page}&pageSize=${pageSize}${q}&apiKey=${API_KEY}`
   );
 
   if (!res.ok) {
