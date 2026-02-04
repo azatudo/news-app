@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const mockNews = [
@@ -23,7 +23,7 @@ const mockNews = [
 ];
 
 export default function NewsListScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   return (
     <FlatList
@@ -32,7 +32,13 @@ export default function NewsListScreen() {
       contentContainerStyle={{ padding: 16 }}
       renderItem={({ item }) => (
         <TouchableOpacity
-          onPress={() => navigation.navigate('Article' as never)}
+          onPress={() =>
+            navigation.push('Article', {
+              title: item.title,
+              description: item.description,
+              date: item.date,
+            })
+          }
           style={{
             padding: 12,
             marginBottom: 12,
