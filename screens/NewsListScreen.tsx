@@ -1,68 +1,69 @@
-import { FlatList, Text, TouchableOpacity, View, Button } from 'react-native';
+import { View, Text, FlatList, Button, ActivityIndicator } from 'react-native';
+import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-
-const mockNews = [
-  {
-    id: '1',
-    title: 'First news',
-    description: 'Short description of the first news',
-    date: '2024-02-01',
-  },
-  {
-    id: '2',
-    title: 'Second news',
-    description: 'Short description of the second news',
-    date: '2024-02-02',
-  },
-  {
-    id: '3',
-    title: 'Third news',
-    description: 'Short description of the third news',
-    date: '2024-02-03',
-  },
-];
+import { fetchNews, NewsArticle } from '../services/newsApi';
 
 export default function NewsListScreen() {
   const navigation = useNavigation<any>();
 
-  return (
-    <View style={{ flex: 1 }}>
-      <View style={{ padding: 16 }}>
-        <Button
-          title="Go to favorites"
-          onPress={() => navigation.navigate('Favorites')}
-        />
-      </View>
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-      <FlatList
-        data={mockNews}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
+  const loadNews = async () => {
+    try {
+      setLoading(true);
+      setError(false);
+      const data = await fetchNews();
+      setNews(data);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadNews();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator style={{ marginTop: 40 }} />;
+  }
+
+  if (error) {
+    return (
+      <View style={{ padding: 16 }}>
+        <Text style={{ marginBottom: 12 }}>Error loading news</Text>
+        <Button title="Retry" onPress={loadNews} />
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={news}
+      keyExtractor={(item, index) => index.toString()}
+      contentContainerStyle={{ padding: 16 }}
+      renderItem={({ item }) => (
+        <View style={{ marginBottom: 16 }}>
+          <Text
+            style={{ fontSize: 16, fontWeight: '600' }}
             onPress={() =>
               navigation.navigate('Article', {
-                id: item.id,
                 title: item.title,
                 description: item.description,
-                date: item.date,
+                date: item.publishedAt,
+                url: item.url,
               })
             }
-            style={{
-              padding: 12,
-              marginBottom: 12,
-              backgroundColor: '#f2f2f2',
-              borderRadius: 8,
-            }}
           >
-            <Text style={{ fontSize: 16, fontWeight: '600' }}>
-              {item.title}
-            </Text>
-            <Text>{item.description}</Text>
-            <Text style={{ fontSize: 12, color: '#888' }}>{item.date}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+            {item.title}
+          </Text>
+
+          <Text style={{ color: '#555' }}>{item.description}</Text>
+        </View>
+      )}
+    />
   );
 }
