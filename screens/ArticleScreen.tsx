@@ -1,7 +1,8 @@
-import { View, Text, Button, Platform } from 'react-native';
+import { View, Text, Button, Platform, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useState } from 'react';
 import { WebView } from 'react-native-webview';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ARTICLE_URL = 'https://example.com';
 
@@ -10,13 +11,28 @@ export default function ArticleScreen() {
   const { title, description, date } = route.params || {};
   const [showWebView, setShowWebView] = useState(false);
 
+  const addToFavorites = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('favorites');
+      const favorites = stored ? JSON.parse(stored) : [];
+
+      const exists = favorites.some((item: any) => item.title === title);
+      if (exists) {
+        Alert.alert('Already in favorites');
+        return;
+      }
+
+      const updated = [...favorites, { title, description, date }];
+      await AsyncStorage.setItem('favorites', JSON.stringify(updated));
+
+      Alert.alert('Added to favorites');
+    } catch {
+      Alert.alert('Error saving favorite');
+    }
+  };
+
   if (Platform.OS !== 'web' && showWebView) {
-    return (
-      <WebView
-        source={{ uri: ARTICLE_URL }}
-        startInLoadingState
-      />
-    );
+    return <WebView source={{ uri: ARTICLE_URL }} startInLoadingState />;
   }
 
   return (
@@ -32,6 +48,10 @@ export default function ArticleScreen() {
       <Text style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>
         {date}
       </Text>
+
+      <Button title="Add to favorites" onPress={addToFavorites} />
+
+      <View style={{ height: 12 }} />
 
       <Button
         title="Open full article"

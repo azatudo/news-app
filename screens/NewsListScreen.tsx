@@ -1,4 +1,4 @@
-import { FlatList, Text, TouchableOpacity } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const mockNews = [
@@ -26,39 +26,48 @@ export default function NewsListScreen() {
   const navigation = useNavigation<any>();
 
   return (
-    <FlatList
-      data={mockNews}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={{ padding: 16 }}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() =>
-            navigation.push('Article', {
-              title: item.title,
-              description: item.description,
-              date: item.date,
-            })
-          }
-          style={{
-            padding: 12,
-            marginBottom: 12,
-            backgroundColor: '#f2f2f2',
-            borderRadius: 8,
-          }}
-        >
-          <Text style={{ fontSize: 16, fontWeight: '600' }}>
-            {item.title}
-          </Text>
+    <View style={{ flex: 1 }}>
+      <View style={{ padding: 16 }}>
+        <Button
+          title="Go to favorites"
+          onPress={() => navigation.navigate('Favorites')}
+        />
+      </View>
 
-          <Text style={{ marginTop: 4, color: '#555' }}>
-            {item.description}
-          </Text>
+      <FlatList
+        data={mockNews}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: 16 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Article', {
+                title: item.title,
+                description: item.description,
+                date: item.date,
+              })
+            }
+            style={{
+              padding: 12,
+              marginBottom: 12,
+              backgroundColor: '#f2f2f2',
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ fontSize: 16, fontWeight: '600' }}>
+              {item.title}
+            </Text>
 
-          <Text style={{ marginTop: 6, fontSize: 12, color: '#888' }}>
-            {item.date}
-          </Text>
-        </TouchableOpacity>
-      )}
-    />
+            <Text style={{ marginTop: 4, color: '#555' }}>
+              {item.description}
+            </Text>
+
+            <Text style={{ marginTop: 6, fontSize: 12, color: '#888' }}>
+              {item.date}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 }
