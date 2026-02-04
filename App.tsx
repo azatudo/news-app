@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -47,15 +47,22 @@ function Tabs({ onLogout }: { onLogout: () => void }) {
 }
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
+      Platform.OS === 'web' ? true : null
+    );
   useEffect(() => {
-    const checkAuth = async () => {
-      const value = await AsyncStorage.getItem('isAuthenticated');
-      setIsAuthenticated(value === 'true');
-    };
-    checkAuth();
-  }, []);
+  const checkAuth = async () => {
+    if (Platform.OS === 'web') {
+      setIsAuthenticated(true);
+      return;
+    }
+
+    const value = await AsyncStorage.getItem('isAuthenticated');
+    setIsAuthenticated(value === 'true');
+  };
+
+  checkAuth();
+}, []);
 
   useEffect(() => {
     const registerForPush = async () => {
