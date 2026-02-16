@@ -7,8 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
-import NewsListScreen from './screens/NewsListScreen';
-import ArticleScreen from './screens/ArticleScreen';
+import NewsListScreen from '@/screens/NewsList';
+import ArticleScreen from '@/screens/Article';
 import FavoritesScreen from '@/screens/Favorites';
 import AuthScreen from '@/screens/Auth';
 import FileScreen from '@/screens/Files';
