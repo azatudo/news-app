@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useNews } from '@/features/news/useNews';
 import NewsCard from '@/entities/news/ui/NewsCard';
 import NewsSearch from '@/widgets/news/NewsSearch';
+import CategoryTabs from '@/widgets/news/CategoryTabs';
 
 export default function NewsListScreen() {
   const navigation = useNavigation<any>();
@@ -15,6 +16,8 @@ export default function NewsListScreen() {
     onRefresh,
     loadMore,
     onSearch,
+    category,
+    changeCategory,
   } = useNews();
 
   if (loading) {
@@ -23,6 +26,7 @@ export default function NewsListScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      <CategoryTabs current={category} onChange={changeCategory} />
       <NewsSearch onSearch={onSearch} />
 
       <FlatList
@@ -40,7 +44,14 @@ export default function NewsListScreen() {
         contentContainerStyle={{ padding: 16 }}
         renderItem={({ item }) => (
           <NewsCard
-            article={item}
+            article={{
+              id: item.id,
+              title: item.title ?? '',
+              description: item.description ?? '',
+              date: item.date ?? '',
+              url: item.url,
+              image: item.image,
+            }}
             onPress={() =>
               navigation.navigate('Article', {
                 id: item.id,

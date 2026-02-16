@@ -6,6 +6,7 @@ export function useNews() {
   const [news, setNews] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('general');
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -13,10 +14,11 @@ export function useNews() {
   const loadNews = async (
     pageToLoad = 1,
     append = false,
-    q = query
+    q = query,
+    c = category
   ) => {
     try {
-      const data = await fetchNews(pageToLoad, q);
+      const data = await fetchNews(pageToLoad, q, c);
       setNews(prev => (append ? [...prev, ...data] : data));
       setPage(pageToLoad);
     } finally {
@@ -27,24 +29,30 @@ export function useNews() {
   };
 
   useEffect(() => {
-    loadNews(1);
+    loadNews(1, false, '', category);
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
-    loadNews(1, false);
+    loadNews(1, false, query, category);
   };
 
   const loadMore = () => {
     if (loadingMore || refreshing) return;
     setLoadingMore(true);
-    loadNews(page + 1, true);
+    loadNews(page + 1, true, query, category);
   };
 
   const onSearch = (text: string) => {
     setQuery(text);
     setLoading(true);
-    loadNews(1, false, text);
+    loadNews(1, false, text, category);
+  };
+
+  const changeCategory = (newCategory: string) => {
+    setCategory(newCategory);
+    setLoading(true);
+    loadNews(1, false, query, newCategory);
   };
 
   return {
@@ -55,5 +63,7 @@ export function useNews() {
     onRefresh,
     loadMore,
     onSearch,
+    category,
+    changeCategory,
   };
 }
