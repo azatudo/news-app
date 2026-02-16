@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, ActivityIndicator, Platform } from 'react-native';
+import { View, ActivityIndicator, Platform, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,7 +9,7 @@ import * as Device from 'expo-device';
 
 import NewsListScreen from './screens/NewsListScreen';
 import ArticleScreen from './screens/ArticleScreen';
-import FavoritesScreen from './screens/FavoritesScreen';
+import FavoritesScreen from '@/screens/Favorites';
 import AuthScreen from '@/screens/Auth';
 import FileScreen from '@/screens/Files';
 
@@ -28,15 +28,21 @@ Notifications.setNotificationHandler({
 
 function Tabs({ onLogout }: { onLogout: () => void }) {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerRight: () => <Button title="Logout" onPress={onLogout} />,
+      }}
+    >
       <Tab.Screen
         name="NewsTab"
         component={NewsListScreen}
         options={{ title: 'News' }}
       />
-      <Tab.Screen name="FavoritesTab" options={{ title: 'Favorites' }}>
-        {() => <FavoritesScreen onLogout={onLogout} />}
-      </Tab.Screen>
+      <Tab.Screen
+        name="FavoritesTab"
+        component={FavoritesScreen}
+        options={{ title: 'Favorites' }}
+      />
       <Tab.Screen
         name="FilesTab"
         component={FileScreen}
