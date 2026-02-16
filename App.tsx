@@ -12,6 +12,7 @@ import ArticleScreen from '@/screens/Article';
 import FavoritesScreen from '@/screens/Favorites';
 import AuthScreen from '@/screens/Auth';
 import FileScreen from '@/screens/Files';
+import { useNotifications } from '@/features/notifications/useNotifications'; // твой хук
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,42 +54,25 @@ function Tabs({ onLogout }: { onLogout: () => void }) {
 }
 
 export default function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
-      Platform.OS === 'web' ? true : null
-    );
-  useEffect(() => {
-  const checkAuth = async () => {
-    if (Platform.OS === 'web') {
-      setIsAuthenticated(true);
-      return;
-    }
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
+    Platform.OS === 'web' ? true : null
+  );
 
-    const value = await AsyncStorage.getItem('isAuthenticated');
-    setIsAuthenticated(value === 'true');
-  };
-
-  checkAuth();
-}, []);
+  // вот вызов хука пуш-уведомлений — без удаления любого кода
+  useNotifications();
 
   useEffect(() => {
-    const registerForPush = async () => {
-      if (!Device.isDevice) return;
-
-      const { status } = await Notifications.getPermissionsAsync();
-      let finalStatus = status;
-
-      if (status !== 'granted') {
-        const permission = await Notifications.requestPermissionsAsync();
-        finalStatus = permission.status;
+    const checkAuth = async () => {
+      if (Platform.OS === 'web') {
+        setIsAuthenticated(true);
+        return;
       }
 
-      if (finalStatus !== 'granted') return;
-
-      const token = await Notifications.getExpoPushTokenAsync();
-      console.log('PUSH TOKEN:', token.data);
+      const value = await AsyncStorage.getItem('isAuthenticated');
+      setIsAuthenticated(value === 'true');
     };
 
-    registerForPush();
+    checkAuth();
   }, []);
 
   if (isAuthenticated === null) {
@@ -104,16 +88,11 @@ export default function App() {
       <Stack.Navigator key={isAuthenticated ? 'app' : 'auth'}>
         {!isAuthenticated ? (
           <Stack.Screen name="Auth" options={{ headerShown: false }}>
-            {() => (
-              <AuthScreen onSuccess={() => setIsAuthenticated(true)} />
-            )}
+            {() => <AuthScreen onSuccess={() => setIsAuthenticated(true)} />}
           </Stack.Screen>
         ) : (
           <>
-            <Stack.Screen
-              name="Home"
-              options={{ headerShown: false }}
-            >
+            <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => <Tabs onLogout={() => setIsAuthenticated(false)} />}
             </Stack.Screen>
             <Stack.Screen
