@@ -1,33 +1,29 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { Article } from '@/entities/news/model/types';
+import { isFavorite, toggleFavorite } from '@/shared/storage/favoritesStorage';
 
-export function useFavorite(article: any) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export function useFavorite(article: Article) {
+  const [favorite, setFavorite] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkFavorite();
-  }, []);
+    check();
+  }, [article.id]);
 
-  const checkFavorite = async () => {
-    const stored = await AsyncStorage.getItem('favorites');
-    const favorites = stored ? JSON.parse(stored) : [];
-    setIsFavorite(favorites.some((item: any) => item.id === article.id));
+  const check = async () => {
+    const result = await isFavorite(article.id);
+    setFavorite(result);
+    setLoading(false);
   };
 
-  const toggleFavorite = async () => {
-    const stored = await AsyncStorage.getItem('favorites');
-    let favorites = stored ? JSON.parse(stored) : [];
-
-    if (favorites.some((item: any) => item.id === article.id)) {
-      favorites = favorites.filter((item: any) => item.id !== article.id);
-      setIsFavorite(false);
-    } else {
-      favorites.push(article);
-      setIsFavorite(true);
-    }
-
-    await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+  const onToggle = async () => {
+    const result = await toggleFavorite(article);
+    setFavorite(result);
   };
 
-  return { isFavorite, toggleFavorite };
+  return {
+    isFavorite: favorite,
+    toggleFavorite: onToggle,
+    loading,
+  };
 }
