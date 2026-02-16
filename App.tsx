@@ -10,8 +10,8 @@ import * as Device from 'expo-device';
 import NewsListScreen from './screens/NewsListScreen';
 import ArticleScreen from './screens/ArticleScreen';
 import FavoritesScreen from './screens/FavoritesScreen';
-import AuthScreen from './screens/AuthScreen';
-import FileScreen from './screens/FileScreen';
+import AuthScreen from '@/screens/Auth';
+import FileScreen from '@/screens/Files';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
