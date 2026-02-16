@@ -6,40 +6,64 @@ type Props = {
   onPress: () => void;
 };
 
+const formatDate = (date: string) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short' }) +
+    ' • ' +
+    d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+};
+
+const getSource = (url: string) => {
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  } catch {
+    return '';
+  }
+};
+
 export default function NewsCard({ article, onPress }: Props) {
   return (
     <TouchableOpacity
       onPress={onPress}
       style={{
-        padding: 12,
-        marginBottom: 12,
-        backgroundColor: '#f2f2f2',
-        borderRadius: 8,
+        marginBottom: 14,
+        backgroundColor: '#ffffff',
+        borderRadius: 12,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#e5e5e5',
       }}
     >
-      {article.image ? (
-        <Image
-          source={{ uri: article.image }}
-          style={{
-            width: '100%',
-            height: 160,
-            borderRadius: 6,
-            marginBottom: 8,
-          }}
-        />
-      ) : null}
+      <View style={{ flexDirection: 'row' }}>
+        {article.image ? (
+          <Image
+            source={{ uri: article.image }}
+            style={{ width: 110, height: 110 }}
+            resizeMode="cover"
+          />
+        ) : null}
 
-      <Text style={{ fontSize: 16, fontWeight: '600' }}>
-        {article.title}
-      </Text>
+        <View style={{ flex: 1, padding: 12 }}>
+          <Text numberOfLines={2} style={{ fontSize: 15, fontWeight: '600' }}>
+            {article.title}
+          </Text>
 
-      <Text style={{ color: '#555', marginTop: 4 }}>
-        {article.description}
-      </Text>
+          <Text numberOfLines={2} style={{ color: '#666', marginTop: 6 }}>
+            {article.description}
+          </Text>
 
-      <Text style={{ fontSize: 12, color: '#888', marginTop: 6 }}>
-        {new Date(article.date).toLocaleDateString()}
-      </Text>
+          <View style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center' }}>
+            <Text style={{ fontSize: 12, color: '#888' }}>
+              {getSource(article.url)}
+            </Text>
+            <Text style={{ fontSize: 12, color: '#888' }}>  •  </Text>
+            <Text style={{ fontSize: 12, color: '#888' }}>
+              {formatDate(article.date)}
+            </Text>
+          </View>
+        </View>
+      </View>
     </TouchableOpacity>
   );
 }

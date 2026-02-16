@@ -1,9 +1,10 @@
-import { View, FlatList, ActivityIndicator, Button } from 'react-native';
+import { View, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useNews } from '@/features/news/useNews';
 import NewsCard from '@/entities/news/ui/NewsCard';
 import NewsSearch from '@/widgets/news/NewsSearch';
 import CategoryTabs from '@/widgets/news/CategoryTabs';
+import SortTabs from '@/widgets/news/SortTabs'; 
 
 export default function NewsListScreen() {
   const navigation = useNavigation<any>();
@@ -29,10 +30,7 @@ export default function NewsListScreen() {
   return (
     <View style={{ flex: 1 }}>
       <CategoryTabs current={category} onChange={changeCategory} />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 8 }}>
-        <Button title="Newest" onPress={() => changeSort('publishedAt')} />
-        <Button title="Relevant" onPress={() => changeSort('relevancy')} />
-      </View>
+      <SortTabs sort={sort} onChange={changeSort} />
       <NewsSearch onSearch={onSearch} />
 
       <FlatList
