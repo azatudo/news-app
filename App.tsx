@@ -12,7 +12,7 @@ import ArticleScreen from '@/screens/Article';
 import FavoritesScreen from '@/screens/Favorites';
 import AuthScreen from '@/screens/Auth';
 import FileScreen from '@/screens/Files';
-import { useNotifications } from '@/features/notifications/useNotifications'; // твой хук
+import { useNotifications } from '@/features/notifications/useNotifications';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -58,7 +58,6 @@ export default function App() {
     Platform.OS === 'web' ? true : null
   );
 
-  // вот вызов хука пуш-уведомлений — без удаления любого кода
   useNotifications();
 
   useEffect(() => {
