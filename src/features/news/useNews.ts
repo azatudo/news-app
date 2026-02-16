@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchNews, NewsArticle } from '../../entities/news/api/newsApi';
+import { fetchNews } from '@/entities/news/api/newsApi';
+import { Article } from '@/entities/news/model/types';
 
 export function useNews() {
-  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [news, setNews] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
