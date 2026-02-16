@@ -65,6 +65,7 @@ export default function NewsListScreen() {
                 description: item.description,
                 date: item.date,
                 url: item.url,
+                image: item.image,
               })
             }
           />

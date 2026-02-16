@@ -1,16 +1,49 @@
-import { View, Text, Button, Platform } from 'react-native';
+import { View, Text, Button, Platform, Image } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Article } from '@/entities/news/model/types';
 import { useFavorite } from '@/features/favorites/useFavorite';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type Props = {
   article: Article;
 };
 
+function getSource(url: string) {
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  } catch {
+    return '';
+  }
+}
+
 export default function ArticleView({ article }: Props) {
   const { isFavorite, toggleFavorite } = useFavorite(article);
   const [openWeb, setOpenWeb] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [usedFallback, setUsedFallback] = useState(false);
+  const imageUriRaw = (article as any).image ?? (article as any).urlToImage;
+  const domain = article.url ? getSource(article.url) : '';
+
+  const primaryImage = imageUriRaw?.replace('http://', 'https://');
+  const fallbackLogo = domain ? `https://logo.clearbit.com/${domain}` : undefined;
+
+  const [currentImage, setCurrentImage] = useState<string | undefined>(primaryImage || fallbackLogo);
+
+  const formatDate = (value?: string) => {
+    if (!value) return '';
+    try {
+      const d = new Date(value);
+      return d.toLocaleString();
+    } catch {
+      return value;
+    }
+  };
+
+  useEffect(() => {
+    setUsedFallback(false);
+    setImgError(false);
+    setCurrentImage(primaryImage || fallbackLogo);
+  }, [primaryImage, fallbackLogo]);
 
   if (Platform.OS !== 'web' && openWeb) {
     return <WebView source={{ uri: article.url }} startInLoadingState />;
@@ -18,6 +51,29 @@ export default function ArticleView({ article }: Props) {
 
   return (
     <View style={{ padding: 16 }}>
+      {(currentImage) && !imgError && (
+        <Image
+          key={currentImage}
+          source={{ uri: currentImage }}
+          onError={() => {
+            if (!usedFallback && fallbackLogo && currentImage !== fallbackLogo) {
+              setUsedFallback(true);
+              setCurrentImage(fallbackLogo);
+              setImgError(false);
+            } else {
+              setImgError(true);
+            }
+          }}
+          style={{
+            width: '100%',
+            height: 220,
+            borderRadius: 12,
+            marginBottom: 12,
+            backgroundColor: '#eee'
+          }}
+          resizeMode="cover"
+        />
+      )}
       <Text style={{ fontSize: 20, fontWeight: '600', marginBottom: 8 }}>
         {article.title}
       </Text>
@@ -29,10 +85,14 @@ export default function ArticleView({ article }: Props) {
       )}
 
       {!!article.date && (
-        <Text style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>
-          {article.date}
+        <Text style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
+          {formatDate(article.date)}
         </Text>
       )}
+
+      <Text style={{ fontSize: 12, color: '#555', marginBottom: 16 }}>
+        {getSource(article.url)}
+      </Text>
 
       <Button
         title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
