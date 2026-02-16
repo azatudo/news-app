@@ -95,7 +95,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator key={isAuthenticated ? 'app' : 'auth'}>
         {!isAuthenticated ? (
           <Stack.Screen name="Auth" options={{ headerShown: false }}>
             {() => (

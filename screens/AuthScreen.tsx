@@ -1,27 +1,12 @@
 import { View, Text, Button, Alert } from 'react-native';
-import * as LocalAuthentication from 'expo-local-authentication';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { loginWithBiometry } from '@/features/auth/useBiometry';
 
 export default function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
   const authenticate = async () => {
-    const hasHardware = await LocalAuthentication.hasHardwareAsync();
-    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-    if (!hasHardware || !isEnrolled) {
-      Alert.alert('Biometry not available');
-      return;
-    }
-
-    const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: 'Login with Face ID',
-    });
-
-    if (result.success) {
-      await AsyncStorage.setItem('isAuthenticated', 'true');
-      onSuccess();
-    } else {
-      Alert.alert('Authentication failed');
-    }
+    const ok = await loginWithBiometry();
+    if (ok) onSuccess();
+    else Alert.alert('Authentication failed');
   };
 
   return (
