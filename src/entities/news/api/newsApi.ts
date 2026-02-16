@@ -14,10 +14,13 @@ const BASE_URL = 'https://newsapi.org/v2';
 export async function fetchNews(
   page: number = 1,
   query: string = '',
-  category: string = 'general'
+  category: string = 'general',
+  sortBy: 'publishedAt' | 'relevancy' = 'publishedAt'
 ): Promise<NewsArticle[]> {
-  const endpoint = query
-    ? `${BASE_URL}/everything?q=${query}&pageSize=10&page=${page}&apiKey=${API_KEY}`
+  const shouldUseEverything = query || sortBy === 'relevancy';
+
+  const endpoint = shouldUseEverything
+    ? `${BASE_URL}/everything?q=${encodeURIComponent(query || 'news')}&sortBy=${sortBy}&pageSize=10&page=${page}&apiKey=${API_KEY}`
     : `${BASE_URL}/top-headlines?country=us&category=${category}&pageSize=10&page=${page}&apiKey=${API_KEY}`;
 
   const res = await fetch(endpoint);
