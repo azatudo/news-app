@@ -1,4 +1,4 @@
-import FileControls from '@/widgets/files/FileControls';
+import FileControls from '@mobile/widgets/files/FileControls';
 
 export default function FileScreen() {
   return <FileControls />;

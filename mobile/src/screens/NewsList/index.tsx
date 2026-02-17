@@ -2,9 +2,9 @@ import { View, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useNews } from '@/features/news/useNews';
 import NewsCard from '@/entities/news/ui/NewsCard';
-import NewsSearch from '@/widgets/news/NewsSearch';
-import CategoryTabs from '@/widgets/news/CategoryTabs';
-import SortTabs from '@/widgets/news/SortTabs'; 
+import NewsSearch from '@mobile/widgets/news/NewsSearch';
+import CategoryTabs from '@mobile/widgets/news/CategoryTabs';
+import SortTabs from '@mobile/widgets/news/SortTabs'; 
 
 export default function NewsListScreen() {
   const navigation = useNavigation<any>();
@@ -35,7 +35,11 @@ export default function NewsListScreen() {
 
       <FlatList
         data={news}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) =>
+          item.id?.toString() ??
+          item.url ??
+          item.title + index
+        }
         onRefresh={onRefresh}
         refreshing={refreshing}
         onEndReached={loadMore}

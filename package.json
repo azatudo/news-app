@@ -1,0 +1,19 @@
+{
+  "name": "news-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Expo + RN + Next monorepo",
+  "type": "commonjs",
+  "workspaces": [
+    "mobile",
+    "web/news-app-web"
+  ],
+  "scripts": {
+    "mobile": "cd mobile && npx expo start",
+    "web": "cd web/news-app-web && npm run dev",
+    "dev": "concurrently \"npm run web\" \"npm run mobile\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

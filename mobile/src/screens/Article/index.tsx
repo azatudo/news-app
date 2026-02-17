@@ -1,5 +1,5 @@
 import { useRoute } from '@react-navigation/native';
-import ArticleView from '@/widgets/article/ArticleView';
+import ArticleView from '@mobile/widgets/article/ArticleView';
 import { Article } from '@/entities/news/model/types';
 
 export default function ArticleScreen() {

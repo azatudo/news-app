@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { fetchNews } from '@/entities/news/api/newsApi';
+import { fetchNews } from '@/shared/api/newsApi';
 import { Article } from '@/entities/news/model/types';
 
 export function useNews() {
@@ -25,7 +25,7 @@ export function useNews() {
     if (isFetching.current) return;
     isFetching.current = true;
     try {
-      const data = await fetchNews(pageToLoad, q, c, s);
+      const data = await fetchNews({ page: pageToLoad, query: q, category: c, sort: s });
 
       // reset pagination when reloading first page
       if (pageToLoad === 1) hasMore.current = true;

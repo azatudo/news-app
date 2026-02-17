@@ -7,12 +7,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
-import NewsListScreen from '@/screens/NewsList';
-import ArticleScreen from '@/screens/Article';
-import FavoritesScreen from '@/screens/Favorites';
-import AuthScreen from '@/screens/Auth';
-import FileScreen from '@/screens/Files';
-import { useNotifications } from '@/features/notifications/useNotifications';
+import NewsListScreen from '@mobile/screens/NewsList';
+import ArticleScreen from '@mobile/screens/Article';
+import FavoritesScreen from '@mobile/screens/Favorites';
+import AuthScreen from '@mobile/screens/Auth';
+import FileScreen from '@mobile/screens/Files';
+import { useNotifications } from '@mobile/features/notifications/useNotifications';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

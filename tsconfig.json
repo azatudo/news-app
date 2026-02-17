@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "skipLibCheck": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@mobile/*": ["mobile/src/*"],
+      "@web/*": ["web/news-app-web/src/*"]
+    },
+
+    "types": ["react", "react-native"]
+  },
+  "include": ["src"]
+}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import { pickFileFromDevice } from '@/shared/lib/files/pickFile';
-import { downloadDummyFile } from '@/shared/lib/files/downloadFile';
+import { pickFileFromDevice } from '@mobile/files/pickFile';
+import { downloadDummyFile } from '@mobile/files/downloadFile';
 
 export function useFiles() {
   const [fileName, setFileName] = useState<string | null>(null);

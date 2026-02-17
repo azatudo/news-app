@@ -4,8 +4,10 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "jsx": "react-native",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["../src/*"],
+      "@mobile/*": ["./src/*"]
     }
   }
 }
