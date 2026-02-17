@@ -1,2 +1,4 @@
-export { default } from '../src/layout';
-export * from '../src/layout';
+import Layout, * as LayoutExports from '../src/layout';
+
+export default Layout;
+export { LayoutExports };

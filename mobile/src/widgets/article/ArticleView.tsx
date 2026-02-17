@@ -1,7 +1,7 @@
 import { View, Text, Button, Platform, Image } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Article } from '@/entities/news/model/types';
-import { useFavorite } from '@/features/favorites/useFavorite';
+import { useFavorites } from '@/features/favorites/useFavorites';
 import { useState, useEffect } from 'react';
 
 type Props = {
@@ -17,7 +17,8 @@ function getSource(url: string) {
 }
 
 export default function ArticleView({ article }: Props) {
-  const { isFavorite, toggleFavorite } = useFavorite(article);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorite = isFavorite(article);
   const [openWeb, setOpenWeb] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [usedFallback, setUsedFallback] = useState(false);
@@ -51,7 +52,7 @@ export default function ArticleView({ article }: Props) {
 
   return (
     <View style={{ padding: 16 }}>
-      {(currentImage) && !imgError && (
+      {currentImage && !imgError && (
         <Image
           key={currentImage}
           source={{ uri: currentImage }}
@@ -95,8 +96,8 @@ export default function ArticleView({ article }: Props) {
       </Text>
 
       <Button
-        title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        onPress={toggleFavorite}
+        title={favorite ? 'Remove from favorites' : 'Add to favorites'}
+        onPress={() => toggleFavorite(article)}
       />
 
       <View style={{ height: 12 }} />

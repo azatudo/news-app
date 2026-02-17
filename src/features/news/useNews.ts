@@ -6,6 +6,7 @@ export function useNews() {
   const [news, setNews] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [category, setCategory] = useState('general');
   const [sort, setSort] = useState<'publishedAt' | 'relevancy'>('publishedAt');
   const [loading, setLoading] = useState(true);
@@ -14,6 +15,18 @@ export function useNews() {
 
   const isFetching = useRef(false);
   const hasMore = useRef(true);
+  const pageRef = useRef(1);
+  // const cache = useRef<Record<string, Article[]>>({}); // per-filter page 1 cache only
+  const abortRef = useRef<AbortController | null>(null);
+  // const currentKeyRef = useRef('');
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 400);
+
+    return () => clearTimeout(id);
+  }, [query]);
 
   const loadNews = async (
     pageToLoad = 1,
@@ -23,20 +36,52 @@ export function useNews() {
     s = sort
   ) => {
     if (isFetching.current) return;
+    // cancel previous request
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    // const baseKey = `${q}_${c}_${s}`;
+    // if (currentKeyRef.current !== baseKey && pageToLoad === 1) {
+    //   setNews([]);
+    //   hasMore.current = true;
+    // }
+    // currentKeyRef.current = baseKey;
     isFetching.current = true;
+    if (pageToLoad === 1) {
+      hasMore.current = true;
+      setLoading(true);
+    }
     try {
-      const data = await fetchNews({ page: pageToLoad, query: q, category: c, sort: s });
+      const normalizedQuery = q && q.trim().length > 0 ? q : undefined;
+      const normalizedCategory = normalizedQuery ? undefined : c;
+      const data = await fetchNews({ page: pageToLoad, query: normalizedQuery, category: normalizedCategory, sort: s, signal: controller.signal } as any);
+      const articles = Array.isArray((data as any)?.articles) ? (data as any).articles : (Array.isArray(data) ? data : []);
+      const mapped = articles.map((a: any): Article => ({
+        id: a.id ?? a.url,
+        title: a.title ?? '',
+        url: a.url,
+        description: a.description ?? a.content ?? '',
+        image: a.image ?? a.urlToImage ?? '',
+        date: a.date ?? a.publishedAt ?? '',
+        source: a.source?.name ?? a.source ?? '',
+      }));
 
-      // reset pagination when reloading first page
-      if (pageToLoad === 1) hasMore.current = true;
-
-      if (!data || data.length === 0) {
-        hasMore.current = false;
+      if (pageToLoad === 1) {
+        hasMore.current = mapped.length > 0;
+        setNews(mapped);
+        setPage(1);
+        pageRef.current = 1;
+      } else {
+        if (mapped.length === 0) {
+          hasMore.current = false;
+        } else {
+          setNews(prev => [...prev, ...mapped]);
+          pageRef.current = pageToLoad;
+          setPage(pageToLoad);
+        }
       }
-
-      setNews(prev => (append ? [...prev, ...data] : data));
-      setPage(pageToLoad);
     } catch (e) {
+      if ((e as any)?.name === 'AbortError') return;
       hasMore.current = false;
       setNews(prev => (append ? prev : []));
     } finally {
@@ -48,55 +93,49 @@ export function useNews() {
   };
 
   useEffect(() => {
-    let cancelled = false;
-    const init = async () => {
-      setLoading(true);
-      try {
-        await loadNews(1, false, '', category, sort);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    init();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setLoading(true);
+    loadNews(1, false, debouncedQuery, category, sort);
+  }, [debouncedQuery, category, sort]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    loadNews(1, false, query, category, sort);
+    loadNews(1, false, debouncedQuery, category, sort);
   };
 
   const loadMore = () => {
-    if (loadingMore || refreshing || loading) return;
+    if (loadingMore || refreshing) return;
     if (isFetching.current) return;
     if (!hasMore.current) return;
     if (news.length === 0) return;
 
+    const nextPage = pageRef.current + 1;
+
     setLoadingMore(true);
-    loadNews(page + 1, true, query, category, sort);
+    loadNews(nextPage, true, debouncedQuery, category, sort);
   };
 
   const onSearch = (text: string) => {
     setQuery(text);
-    setLoading(true);
-    loadNews(1, false, text, category, sort);
   };
 
   const changeCategory = (newCategory: string) => {
     setCategory(newCategory);
-    setLoading(true);
-    loadNews(1, false, query, newCategory, sort);
+    setNews([]);
+    hasMore.current = true;
+    pageRef.current = 1;
+    setPage(1);
   };
 
   const changeSort = (newSort: 'publishedAt' | 'relevancy') => {
     setSort(newSort);
-    setLoading(true);
-    loadNews(1, false, query, category, newSort);
+    setNews([]);
+    hasMore.current = true;
+    pageRef.current = 1;
+    setPage(1);
   };
 
   return {
+    query,
     news,
     loading,
     refreshing,

@@ -32,6 +32,7 @@ export default function NewsListScreen() {
       <CategoryTabs current={category} onChange={changeCategory} />
       <SortTabs sort={sort} onChange={changeSort} />
       <NewsSearch onSearch={onSearch} />
+      
 
       <FlatList
         data={news}
