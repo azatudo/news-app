@@ -1,139 +1,113 @@
-# News App (Expo / React Native)
 
-Тестовое мобильное приложение на **Expo + React Native + TypeScript**, реализованное в рамках тестового задания Frontend Mobile Developer.
+# News App
 
-Проект демонстрирует работу с API, навигацией, локальным хранилищем, биометрией, push-уведомлениями и файловой системой.
+Test task implementation with shared architecture:
 
----
-
-## Технологический стек
-
-- **Expo (SDK 53–54)** — ускорение разработки, кроссплатформенность
-- **React Native** — мобильное приложение под iOS / Android / Web
-- **TypeScript** — строгая типизация и надёжность
-- **React Navigation (Stack + Bottom Tabs)** — навигация между экранами
-- **AsyncStorage** — локальное хранилище данных
-- **expo-local-authentication** — Face ID / Touch ID
-- **expo-notifications** — локальные push-уведомления
-- **expo-file-system / expo-document-picker** — работа с файлами
-- **NewsAPI** — источник данных о новостях
-
-Выбор Expo обусловлен быстрым стартом проекта, простотой настройки нативных API и хорошей поддержкой мобильных возможностей без необходимости писать нативный код.
+The main client is implemented on Next.js, and the mobile application acts as a wrapper over the web application.  
+Business logic is unified and reused across platforms, reducing duplication and simplifying support.
 
 ---
 
-## Архитектурные решения
+## Architecture
 
-Проект построен по простой и понятной архитектуре без overengineering:
+Single source of truth:
 
-```
-screens/   — UI-экраны приложения
-services/  — работа с API и бизнес-логика
-App.tsx    — корневая навигация и инициализация приложения
-```
+shared logic → web client (Next.js) → mobile wrapper (React Native)
 
-### Основные принципы:
-- разделение UI и логики
-- отсутствие глобального состояния (Redux не требуется для масштаба задачи)
-- хранение данных локально через AsyncStorage
-- навигация через комбинацию Stack + Bottom Tabs
+The project separates domain logic from UI.  
+Fetching, pagination, search, filters, favorites and storage logic live in `/src` and are reused by both platforms.
 
-Такой подход облегчает поддержку и расширение приложения.
+### Why this approach
+
+Traditional approach:
+- separate React Native app
+- separate Web app
+- duplicated API logic
+- duplicated state handling
+- inconsistent behavior
+
+Current approach:
+- one business logic layer
+- identical behavior on web and mobile
+- faster feature development
+- simpler maintenance
 
 ---
 
-## Установка и запуск проекта
+## Tech Stack
 
-### 1. Клонирование репозитория
-```bash
-git clone https://github.com/azatudo/news-app.git
-cd news-app
-```
+### Shared logic
+- TypeScript
+- Feature based structure
+- Platform independent hooks and services
 
-### 2. Установка зависимостей
-```bash
+### Web
+- Next.js (App Router)
+- Server routes as API proxy
+- Responsive UI
+- SEO friendly pages
+
+### Mobile
+- React Native (Expo)
+- Web wrapper over main client
+- Native integrations (storage, biometrics, notifications)
+
+---
+
+## Features
+
+### News feed
+- Pagination
+- Search
+- Category filtering
+- Sorting
+- Pull to refresh
+- Infinite scroll
+
+### Article page
+- Detailed article view
+- External link open
+- Back navigation
+
+### Favorites
+- Add/remove favorite
+- Persistent storage
+- Shared state between platforms
+
+### UX states
+- Skeleton loading
+- Empty state
+- Error state with retry
+
+---
+
+## Project Structure
+
+src/
+- entities — types
+- features — business logic
+- shared — api and storage
+
+web/
+- Next.js application (main client)
+
+mobile/
+- React Native wrapper
+
+---
+
+## Run
+
+Install dependencies:
+
 npm install
-```
 
-### 3. Настройка переменных окружения
-Создайте файл `.env` в корне проекта:
-```env
-EXPO_PUBLIC_NEWS_API_KEY=your_newsapi_key_here
-```
+Run web:
 
-Файл `.env` не хранится в репозитории.  
-Пример доступен в `.env.example`.
+cd web/news-app-web
+npm run dev
 
-### 4. Запуск приложения
-```bash
+Run mobile:
+
+cd mobile
 npm start
-```
-
-Доступные варианты запуска:
-- iOS Simulator
-- Android Emulator
-- Web
-
----
-
-## Тестирование приложения
-
-В рамках тестового задания использовалось ручное тестирование:
-
-- проверка загрузки новостей
-- проверка пагинации и поиска
-- добавление и удаление избранных статей
-- проверка сохранения состояния после перезапуска
-- тестирование Face ID в iOS Simulator
-- проверка локальных push-уведомлений
-- проверка выбора и скачивания файлов
-
-Автотесты не добавлялись, так как это не являлось обязательным требованием ТЗ.
-
----
-
-## Реализованные функции
-
-### Новости
-- Загрузка новостей с NewsAPI
-- Обработка состояний loading / error
-- Pull-to-refresh
-- Infinite scroll (pagination)
-- Поиск по новостям
-
-### Детали статьи
-- Экран детальной информации
-- Открытие полной статьи (WebView / браузер)
-- Добавление в избранное
-
-### Избранное
-- Сохранение в AsyncStorage
-- Удаление статей
-- Persisted state
-
-### Биометрия
-- Проверка Face ID / Touch ID
-- Используется `expo-local-authentication`
-
-### Push-уведомления
-- Локальные push-уведомления
-- Тестовая отправка уведомлений
-- Реализовано через `expo-notifications`
-
-> В Expo Go существуют ограничения, для полноценной поддержки remote push требуется development build.
-
-### 📁 Работа с файлами
-- Выбор файла с устройства
-- Скачивание файла по URL
-- Сохранение в локальное хранилище
-- Отдельный экран Files
-
----
-
-## Ограничения NewsAPI
-
-NewsAPI имеет лимит запросов (100 запросов / 24 часа для free-tier).
-При превышении лимита приложение может временно отображать ошибку загрузки данных.
-
----
-
